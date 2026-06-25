@@ -1,7 +1,7 @@
 name: KAS Monitor
 on:
   schedule:
-    - cron: '* 5-18 * * 1-6'
+    - cron: '*/2 5-16 * * 1-5'
   workflow_dispatch:
 
 jobs:
