@@ -1,0 +1,38 @@
+name: KAS Monitor
+on:
+  schedule:
+    - cron: '* 5-18 * * 1-6'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Wczytaj seen_listings z cache
+        uses: actions/cache@v4
+        with:
+          path: seen_listings.json
+          key: seen-listings
+          restore-keys: seen-listings
+
+      - name: Zainstaluj zależności
+        run: pip install -r requirements.txt
+
+      - name: Sprawdź ogłoszenia
+        env:
+          TELEGRAM_TOKEN:   ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python -c "from monitor import check_all; check_all()"
+
+      - name: Zapisz seen_listings do cache
+        uses: actions/cache@v4
+        with:
+          path: seen_listings.json
+          key: seen-listings-${{ github.run_id }}
+          restore-keys: seen-listings
